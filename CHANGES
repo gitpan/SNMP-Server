@@ -4,3 +4,6 @@ If a log file was being continually replenished (e.g. if you're
 "tailing" /dev/ttyS0), the script would never terminate. This has now
 been fixed.
 
+1.002 -> 1.003
+
+Fixed broken dependencies on other modules.

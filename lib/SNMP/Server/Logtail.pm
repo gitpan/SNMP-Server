@@ -2,8 +2,8 @@ package SNMP::Server::Logtail;
 require v5.8.1;			# need 5.8.1 for reliable threads
 use strict;
 use vars qw( $VERSION @ISA @EXPORT );
-# $Id: Logtail.pm,v 1.1 2004/11/18 16:52:03 abuse Exp $
-$VERSION = do { my @r=(q$Revision: 1.1 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
+# $Id: Logtail.pm,v 1.2 2004/11/26 11:37:34 abuse Exp $
+$VERSION = do { my @r=(q$Revision: 1.2 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
 @EXPORT=qw( snmpd_init add_oidmap add_logfile snmpd_run );
 @ISA=qw( Exporter );
 
