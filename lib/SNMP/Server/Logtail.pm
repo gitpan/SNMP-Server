@@ -2,8 +2,8 @@ package SNMP::Server::Logtail;
 require v5.8.1;			# need 5.8.1 for reliable threads
 use strict;
 use vars qw( $VERSION @ISA @EXPORT );
-# $Id: Logtail.pm,v 1.2 2004/11/26 11:37:34 abuse Exp $
-$VERSION = do { my @r=(q$Revision: 1.2 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
+# $Id: Logtail.pm,v 1.3 2005/03/16 15:41:58 abuse Exp $
+$VERSION = do { my @r=(q$Revision: 1.3 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
 @EXPORT=qw( snmpd_init add_oidmap add_logfile snmpd_run );
 @ISA=qw( Exporter );
 
@@ -152,11 +152,11 @@ sub run_monitor {
   until($stop) {
     open LOG, '<', $logname
       or croak "Can't open $logname: $!";
-    my $curinode=(stat LOG)[1];
+    my($curinode, $cursize)=(stat LOG)[(1, 7)];
 
     my $rotated=0;
     until($rotated || $stop) {
-      my $newinode=(stat $logname)[1];
+      my($newinode, $newsize)=(stat $logname)[(1, 7)];
       while(my $line=<LOG>) {
 	lock %counter;
 	&{$subref}(\%counter, $line);
@@ -165,7 +165,11 @@ sub run_monitor {
       }
       sleep 1;
       # has logfile been rotated?
-      if(defined $newinode && $curinode != $newinode) {
+      if(defined $newinode && (
+			       $newinode != $curinode # file has been rotated
+			       || $newsize < $cursize # file has been truncated
+			      )
+	) {
 	$rotated=1;
 	warn "Log rotated, will reopen $logname\n";
       }
@@ -224,6 +228,7 @@ sub snmpd_run {
     if(exists $oidmap{$suffix}) {
       lock %counter;
       my $value=$counter{$oidmap{$suffix}} || 0;
+      $value &= 0xffffffff;
       print "$prefix.$suffix\ncounter\n$value\n";
     } else {
       print "NONE\n";
