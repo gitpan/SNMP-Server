@@ -9,7 +9,8 @@ $VERSION = do { my @r=(q$Revision: 1.1 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r }
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+	      ABSTRACT => 'Server-side SNMP modules',
 	      NAME     => 'SNMP::Server::Logtail',
 	      DISTNAME => 'SNMP-Server',
-	      VERSION  => '1.001'
+	      VERSION  => '1.002'
 	     );

@@ -161,6 +161,7 @@ sub run_monitor {
 	lock %counter;
 	&{$subref}(\%counter, $line);
 	#print "\033[H\033[J", Dumper \%counter, scalar localtime;
+	last if $stop;
       }
       sleep 1;
       # has logfile been rotated?

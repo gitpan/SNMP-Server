@@ -1,0 +1,6 @@
+1.001 -> 1.002
+
+If a log file was being continually replenished (e.g. if you're
+"tailing" /dev/ttyS0), the script would never terminate. This has now
+been fixed.
+
