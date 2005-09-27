@@ -1,9 +1,17 @@
+#!/usr/bin/env perl
+# -*- mode: perl; coding: iso-8859-1 -*-
+# Author: Peter Corlett
+# Contact: abuse@cabal.org.uk
+# Revision: $Revision$
+# Date: $Date$
+# Copyright: (c) 2005 Peter Corlett - All Rights Reserved
+
 package SNMP::Server::Logtail;
 require v5.8.1;			# need 5.8.1 for reliable threads
 use strict;
 use vars qw( $VERSION @ISA @EXPORT );
-# $Id: Logtail.pm,v 1.3 2005/03/16 15:41:58 abuse Exp $
-$VERSION = do { my @r=(q$Revision: 1.3 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
+# $Id: Logtail.pm 35 2005-09-27 13:27:28Z abuse $
+$VERSION = do { my @r=(q$Revision: 35 $=~/\d+/g); sprintf "%d."."%03d"x$#r,@r };
 @EXPORT=qw( snmpd_init add_oidmap add_logfile snmpd_run );
 @ISA=qw( Exporter );
 
@@ -149,11 +157,20 @@ sub add_oidmap {
 sub run_monitor {
   my($logname, $subref)=@_;
   warn "Starting monitoring $logname\n";
+  my $first=1;
   until($stop) {
     open LOG, '<', $logname
       or croak "Can't open $logname: $!";
     my($curinode, $cursize)=(stat LOG)[(1, 7)];
-
+    if($first) {
+      # If this is the first run (i.e. the logfile hasn't been rotate
+      # on us) we seek to the end of the file and start tailing from
+      # there. This is so that all the previous entries in the logfile
+      # don't appear all at once and be potentially graphed as
+      # happening in the last moment.
+      seek LOG, 2, 0;
+      $first=0;
+    }
     my $rotated=0;
     until($rotated || $stop) {
       my($newinode, $newsize)=(stat $logname)[(1, 7)];
